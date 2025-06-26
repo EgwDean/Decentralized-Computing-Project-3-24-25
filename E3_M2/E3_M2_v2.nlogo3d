@@ -33,7 +33,7 @@ to setup-world
   reset-perspective
   orbit-down 90
 
-  ; Χρωματίζουμε τα τοιχώματα και τον πυθμένα του "ποτηριού" με γκρι χρώμα.
+  ; Χρωματίζουμε τα τοιχώματα και τον πυθμένα του "ποτηριού" με γκρι χρώμα. (Εκτός από το τείχωμα που βλέπουμε και το ταβάνι)
   ask patches with [ (pxcor = min-pxcor or pxcor = max-pxcor or pycor = max-pycor or pzcor = min-pzcor) ] [
     set pcolor gray
   ]
@@ -55,9 +55,9 @@ to setup-nucleation-sites
 end
 
 to setup-gas-molecules
-  ; Δημιουργούμε τα μόρια του αερίου.
+  ; Δημιουργούμε τα μόρια του αερίου. (π.χ. CO2)
   ; Ο αριθμός τους καθορίζεται από το slider 'carbonation-level'.
-  create-gas-molecules carbonation-level [
+  create-gas-molecules (carbonation-level * 100) [
     ; Τα τοποθετούμε σε τυχαίες 3D θέσεις.
     setxyz random-pxcor random-pycor random-pzcor
     ; Τα κάνουμε αόρατα.
@@ -88,8 +88,7 @@ end
 to move-and-stick  ; Κώδικας που εκτελείται από κάθε μόριο αερίου (gas-molecule).
   ; Τυχαία περιστροφή σε 3D.
   rt random-float 360  ; Περιστροφή γύρω από τον άξονα Z
-  let angle-x (random-float 180 - 90) ; Υπολογίζουμε την γωνία για τον άξονα X
-  set pitch angle-x ; Περιστροφή γύρω από τον άξονα X (-90 έως 90)
+  set pitch (random-float 180 - 90) ; Περιστροφή γύρω από τον άξονα X (-90 έως 90)
   set roll random-float 360  ; Περιστροφή γύρω από τον άξονα Y
 
   fd 1 ; Κίνηση προς τα εμπρός.
@@ -159,40 +158,40 @@ ticks
 30.0
 
 SLIDER
-156
-85
-328
-118
+330
+89
+502
+122
 carbonation-level
 carbonation-level
+0
 100
-10000
-10000.0
-100
+100.0
+1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-156
-147
-328
-180
+330
+151
+502
+184
 nucleation-sites-count
 nucleation-sites-count
 10
-500
-500.0
+1000
+200.0
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-155
-205
-327
-238
+329
+209
+501
+242
 bubble-threshold
 bubble-threshold
 5
@@ -204,10 +203,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-399
-115
-462
-148
+565
+116
+628
+149
 Setup
 setup
 NIL
@@ -221,10 +220,10 @@ NIL
 1
 
 BUTTON
-400
-181
-463
-214
+566
+182
+629
+215
 Go
 go
 T
@@ -235,6 +234,36 @@ NIL
 NIL
 NIL
 NIL
+1
+
+TEXTBOX
+10
+97
+296
+122
+Ελέγχει πόσα μόρια διαλυμμένου αερίου υπάρχουν στο νερό.(Π.χ. μόρια CO2)
+10
+0.0
+1
+
+TEXTBOX
+11
+154
+294
+185
+Ελέγχει πόσα σημεία στα τειχώματα μπορούν να δεσμέυσουν μόρια διαλυμμένου αεριού και να δημιουργήσουν φυσαλίδες.
+10
+0.0
+1
+
+TEXTBOX
+11
+210
+267
+237
+Ελέγχει πόσα μόρια διαλυμμένου αεριού χρειάζονται για να δημιουργηθεί μια φυσαλίδα.
+10
+0.0
 1
 
 @#$#@#$#@
