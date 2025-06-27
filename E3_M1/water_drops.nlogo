@@ -69,14 +69,12 @@ end
 
 
 
-
-
 @#$#@#$#@
 GRAPHICS-WINDOW
-520
-28
-983
-492
+360
+21
+823
+485
 -1
 -1
 7.0
@@ -125,17 +123,17 @@ humidity-rate
 humidity-rate
 0
 100
-61.0
+52.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-133
-48
-196
-81
+123
+44
+186
+77
 go1
 go1
 NIL
@@ -157,17 +155,17 @@ gravity
 gravity
 0
 100
-27.0
+100.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-66
+199
+45
 262
-129
-295
+78
 go1
 go1
 T
@@ -181,15 +179,15 @@ NIL
 1
 
 SLIDER
-44
+41
 174
-216
+213
 207
 friction
 friction
 0
 100
-57.0
+45.0
 1
 1
 NIL
