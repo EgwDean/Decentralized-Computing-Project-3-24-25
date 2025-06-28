@@ -3,7 +3,7 @@ globals [
 ]
 
 patches-own [
-  counter
+  counter ;; counter for how much longer the trees will burn
 ]
 
 to setup
@@ -12,24 +12,24 @@ to setup
   ask patches [
     if (random 100) < density [
       set pcolor green
-      set counter 1
+      set counter 1 ;; green trees will burn for 1 moment
     ]
     ;; make a column of burning trees at the left-edge
     if pxcor = min-pxcor [
       set pcolor red
-      set counter 0
+      set counter 0 ;; red trees will burn for 0
     ]
   ]
 
   ask patches with [pcolor = green] [
     if (random 100) < type-two-trees [
-      set pcolor brown
-      set counter 2
+      set pcolor brown ;; brown trees are a percentage of the green trees
+      set counter 2 ;; brown for two moments
     ]
   ]
 
   ;; keep track of how many trees there are
-  set initial-trees count patches with [pcolor = green or pcolor = brown]
+  set initial-trees count patches with [pcolor = green or pcolor = brown] ;; we also have brown trees
   reset-ticks
 end
 
@@ -52,12 +52,37 @@ to go
       set pcolor red - 3.5
     ]
     [
-      set counter counter - 1
+      set counter counter - 1 ;; reduce counter. green tree -> counter 0. brown tree -> counter 1. it will burn for one more round
     ]
   ]
 
 
   tick ;; advance the clock by one “tick”
+end
+
+;; same as before.
+to run-probability-analysis
+  ;;set density 60
+
+
+  foreach n-values 100 [ i -> i + 1 ] [ prob-value ->
+    set probability prob-value
+    setup
+
+
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+
+    let burnt-trees count patches with [pcolor != green and pcolor != brown and pcolor != black]
+
+
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+
+    print (word "Probability: " prob-value " Burnt percentage: " burnt-percentage)
+  ]
 end
 
 
@@ -111,7 +136,7 @@ density
 density
 0.0
 99.0
-48.0
+40.0
 1.0
 1
 %
@@ -160,7 +185,7 @@ probability
 probability
 0
 100
-50.0
+100.0
 1
 1
 NIL
@@ -175,11 +200,28 @@ type-two-trees
 type-two-trees
 0
 100
-100.0
+50.0
 1
 1
 %
 HORIZONTAL
+
+BUTTON
+32
+291
+193
+324
+run-probability-analysis
+run-probability-analysis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGMENT

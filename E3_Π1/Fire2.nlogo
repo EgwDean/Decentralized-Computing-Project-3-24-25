@@ -3,7 +3,7 @@ globals [
 ]
 
 patches-own [
-  flag  ;;
+  flag  ;; flag for green trees that just turned red
 ]
 
 to setup
@@ -17,7 +17,7 @@ to setup
     ;; make a column of burning trees at the left-edge
     if pxcor = min-pxcor [
       set pcolor red
-      set flag 1
+      set flag 1 ;; red trees start with flag 1
     ]
   ]
   ;; keep track of how many trees there are
@@ -30,17 +30,17 @@ to go
   if all? patches [ pcolor != red ] [
     stop
   ]
-  ;; ask the burning trees to set fire to any neighboring non-burning trees
+ ;; i swapped the loop logic. although i shouldnt have. too tired to change it back now
   ask patches with [ pcolor = green ] [ ;; ask the not burning trees
 
-    let count-of-burning count neighbors with [pcolor = red]
+    let count-of-burning count neighbors with [pcolor = red] ;; count burning neighbors
 
     if count-of-burning >= ignite-threshold   [ ;; ask their non-burning neighbor trees
       set pcolor red ;; to catch on fire
     ]
   ]
 
-  ask patches with [pcolor = red] [
+  ask patches with [pcolor = red] [ ;; all red trees get asked. but we dont want the trees that just became red to become black.
 
    ifelse  (flag = 1) [
       set pcolor red - 3.5 ;; once the tree is burned, darken its color
@@ -54,6 +54,33 @@ to go
 
   tick ;; advance the clock by one “tick”
 end
+
+
+to run-density-analysis
+  ;; density 1-100
+  foreach n-values 100 [ i -> i + 1 ] [ density-value ->
+
+    set density density-value
+
+    ;; setup
+    setup
+
+    ;; fire dies...
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+    ;; trees burnt
+    let burnt-trees count patches with [pcolor != green and pcolor != black]
+
+    ;; percentage
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+    ;; print
+    print (word "Density: " density-value " Burnt percentage: " burnt-percentage)
+  ]
+end
+
 
 
 ; Copyright 2006 Uri Wilensky.
@@ -106,7 +133,7 @@ density
 density
 0.0
 99.0
-40.0
+100.0
 1.0
 1
 %
@@ -155,6 +182,23 @@ ignite-threshold
 ignite-threshold
 1 2 3 4
 2
+
+BUTTON
+27
+267
+170
+300
+run-density-analysis
+run-density-analysis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGMENT

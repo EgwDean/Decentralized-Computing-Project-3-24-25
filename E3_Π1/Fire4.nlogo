@@ -28,13 +28,38 @@ to go
   ask patches with [ pcolor = red ] [ ;; ask the burning trees
     ask neighbors with [pcolor = green] [ ;; ask their non-burning neighbor trees
 
-      if  random-float 100 < probability [
+      if  random-float 100 < probability [ ;; use probability
         set pcolor red ;; to catch on fire
       ]
     ]
     set pcolor red - 3.5 ;; once the tree is burned, darken its color
   ]
   tick ;; advance the clock by one “tick”
+end
+
+to run-probability-analysis
+  ;;set density 60
+
+  ;; same as before, but now for different probabilities
+  foreach n-values 100 [ i -> i + 1 ] [ prob-value ->
+    set probability prob-value
+
+    setup
+
+
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+
+    let burnt-trees count patches with [pcolor != green and pcolor != black]
+
+
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+
+    print (word "Probability: " prob-value " Burnt percentage: " burnt-percentage)
+  ]
 end
 
 
@@ -88,7 +113,7 @@ density
 density
 0.0
 99.0
-41.0
+60.0
 1.0
 1
 %
@@ -142,6 +167,23 @@ probability
 1
 NIL
 HORIZONTAL
+
+BUTTON
+26
+234
+187
+267
+run-probability-analysis
+run-probability-analysis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGMENT

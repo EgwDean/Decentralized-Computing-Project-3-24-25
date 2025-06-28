@@ -17,7 +17,7 @@ to setup
   ]
 
   let middle-x 0
-  ask patches with [
+  ask patches with [ ;; isnert a road. hardcoded black patches.
     (pxcor >= middle-x - 1) and (pxcor <= middle-x + 1) and
     (pycor >= min-pycor) and (pycor <= 0)
   ] [
@@ -42,7 +42,7 @@ to go
 
       let direction towards myself
 
-      if direction = 0 [
+      if direction = 0 [ ;; same as before wind logic.
         set probability probability - wind-up
       ]
 
@@ -64,6 +64,44 @@ to go
     set pcolor red - 3.5 ;; once the tree is burned, darken its color
   ]
   tick ;; advance the clock by one “tick”
+end
+
+to run-wind-right-analysis
+  ;; identical as 3rd question
+  foreach n-values 101 [ i -> i - 50 ] [ wind-val ->
+
+    set wind-right wind-val
+
+    setup
+
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+    let burnt-trees count patches with [pcolor != green and pcolor != black]
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+    print (word "Wind-right: " wind-val " Burnt percentage: " burnt-percentage)
+  ]
+end
+
+to run-wind-up-analysis
+  ;; you already know its the same.
+  foreach n-values 101 [ i -> i - 50 ] [ wind-val ->
+
+    set wind-up wind-val
+
+    setup
+
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+    let burnt-trees count patches with [pcolor != green and pcolor != black]
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+    print (word "Wind-up: " wind-val " Burnt percentage: " burnt-percentage)
+  ]
 end
 
 
@@ -117,7 +155,7 @@ density
 density
 0.0
 99.0
-72.0
+75.0
 1.0
 1
 %
@@ -181,11 +219,45 @@ wind-right
 wind-right
 -50
 50
-20.0
+0.0
 1
 1
 NIL
 HORIZONTAL
+
+BUTTON
+24
+288
+182
+321
+run-wind-right-analysis
+run-wind-right-analysis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+29
+334
+176
+367
+run-wind-up-analysis
+run-wind-up-analysis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGMENT

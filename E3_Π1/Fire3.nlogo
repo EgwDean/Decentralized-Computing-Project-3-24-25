@@ -32,19 +32,19 @@ to go
 
       let direction towards myself
 
-      if direction = 0 [
-        set probability probability - wind-up
+      if direction = 0 [ ;; if burnt tree upwards
+        set probability probability - wind-up ;;adjust possibility accordingly
       ]
 
-      if direction = 90 [
+      if direction = 90 [ ;; right
         set probability probability - wind-right
       ]
 
-      if direction = 180 [
+      if direction = 180 [ ;; down
         set probability probability + wind-up
       ]
 
-      if direction = 270 [
+      if direction = 270 [ ;; left
         set probability probability + wind-right
       ]
       if random 100 < probability [
@@ -55,6 +55,45 @@ to go
   ]
   tick ;; advance the clock by one “tick”
 end
+
+to run-wind-right-analysis
+  ;; now we calculate wind values. same logic as before
+  foreach n-values 101 [ i -> i - 50 ] [ wind-val ->
+
+    set wind-right wind-val
+
+    setup
+
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+    let burnt-trees count patches with [pcolor != green and pcolor != black] ;; calculate the percentage
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+    print (word "Wind-right: " wind-val " Burnt percentage: " burnt-percentage)
+  ]
+end
+
+to run-wind-up-analysis
+  ;; same logic.
+  foreach n-values 101 [ i -> i - 50 ] [ wind-val ->
+
+    set wind-up wind-val
+
+    setup
+
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+    let burnt-trees count patches with [pcolor != green and pcolor != black]
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+    print (word "Wind-up: " wind-val " Burnt percentage: " burnt-percentage)
+  ]
+end
+
 
 
 ; Copyright 2006 Uri Wilensky.
@@ -107,7 +146,7 @@ density
 density
 0.0
 99.0
-72.0
+70.0
 1.0
 1
 %
@@ -156,7 +195,7 @@ wind-up
 wind-up
 -50
 50
-0.0
+50.0
 1
 1
 NIL
@@ -176,6 +215,40 @@ wind-right
 1
 NIL
 HORIZONTAL
+
+BUTTON
+34
+283
+192
+316
+run-wind-right-analysis
+run-wind-right-analysis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+41
+330
+188
+363
+run-wind-up-analysis
+run-wind-up-analysis
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## ACKNOWLEDGMENT

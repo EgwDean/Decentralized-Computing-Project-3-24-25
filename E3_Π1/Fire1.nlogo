@@ -26,12 +26,37 @@ to go
   ]
   ;; ask the burning trees to set fire to any neighboring non-burning trees
   ask patches with [ pcolor = red ] [ ;; ask the burning trees
-    ask neighbors with [pcolor = green] [ ;; ask their non-burning neighbor trees
+    ask neighbors with [pcolor = green] [ ;; ask their non-burning neighbor trees. only change made was here
       set pcolor red ;; to catch on fire
     ]
     set pcolor red - 3.5 ;; once the tree is burned, darken its color
   ]
   tick ;; advance the clock by one “tick”
+end
+
+to run-density-analysis
+  ;;density 1 -100
+  foreach n-values 100 [ i -> i + 1 ] [ density-value ->
+
+    set density density-value
+
+    ;; setup
+    setup
+
+    ;; run until fire dies out
+    while [any? patches with [pcolor = red]] [
+      go
+    ]
+
+    ;; trees burnt
+    let burnt-trees count patches with [pcolor != green and pcolor != black]
+
+    ;; percentage
+    let burnt-percentage burnt-trees / initial-trees * 100
+
+    ;; print
+    print (word "Density: " density-value " Burnt percentage: " burnt-percentage)
+  ]
 end
 
 
@@ -115,6 +140,23 @@ BUTTON
 115
 setup
 setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+26
+191
+169
+224
+run-density-analysis
+run-density-analysis
 NIL
 1
 T

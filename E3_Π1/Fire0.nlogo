@@ -2,139 +2,72 @@ globals [
   initial-trees   ;; how many trees (green patches) we started with
 ]
 
-patches-own [
-  counter ;; counter for brown trees.
-]
-
 to setup
   clear-all
   ;; make some green trees
   ask patches [
     if (random 100) < density [
       set pcolor green
-      set counter 1 ;; one tick burn
     ]
     ;; make a column of burning trees at the left-edge
     if pxcor = min-pxcor [
       set pcolor red
-      set counter 0 ;; 0 ticks burn
     ]
   ]
-
-  let middle-x 0
-  ask patches with [ ;; put a road in the middle
-    (pxcor >= middle-x - 1) and (pxcor <= middle-x + 1) and
-    (pycor >= min-pycor) and (pycor <= 0)
-  ] [
-    set pcolor black
-  ]
-
-
-  ask patches with [pcolor = green] [ ;; half of green trees become brown. after road inserted.
-    if (random 100) < type-two-trees [
-      set pcolor brown
-      set counter 2 ;; burn for two ticks
-    ]
-  ]
-
-
-
-
   ;; keep track of how many trees there are
-  set initial-trees count patches with [pcolor = green or pcolor = brown]
+  set initial-trees count patches with [pcolor = green]
   reset-ticks
 end
 
 to go
-
-  if all? patches [ pcolor != red ] [ stop ]
-
-  ask patches with [ pcolor = red ] [
-    ;; ask the unburned trees neighboring the burning tree
-    ask neighbors with [ pcolor = green or pcolor = brown] [
-
-      let probability probability-of-spread
-      let direction towards myself
-
-      if direction = 0 [
-        set probability probability - wind-up
-      ]
-
-      if direction = 90 [
-        set probability probability - wind-right
-      ]
-
-      if direction = 180 [
-        set probability probability + wind-up
-      ]
-
-      if direction = 270 [
-        set probability probability + wind-right
-      ]
-
-      if direction = 45 [ ;; we also calculate diagonal wind by adding the up and right values / 2. (we also have - according to the direction)
-        set probability probability - ((wind-up + wind-right) / 2)
-
-      ]
-
-      if direction = 135 [ ;; same idea.
-        set probability probability + ((wind-up - wind-right) / 2)
-
-      ]
-
-      if direction = 225 [
-        set probability probability + ((wind-up + wind-right) / 2)
-
-      ]
-
-      if direction = 315 [
-        set probability probability - ((wind-up - wind-right) / 2)
-      ]
-
-
-      if random 100 < probability [ ;; probability. easy enough
-        set pcolor red ;; to catch on fire
-        set counter counter - 1
-      ]
+  ;; stop the model when done
+  if all? patches [ pcolor != red ] [
+    stop
+  ]
+  ;; ask the burning trees to set fire to any neighboring non-burning trees
+  ask patches with [ pcolor = red ] [ ;; ask the burning trees
+    ask neighbors4 with [pcolor = green] [ ;; ask their non-burning neighbor trees
+      set pcolor red ;; to catch on fire
     ]
-    ifelse (counter = 0) [
-      set pcolor red - 3.5 ;; i forgot to add it before, but red = 3.5 is not considered red for the patches condition.
-    ]
-    [
-      set counter counter - 1 ;; lower the burning counter
-    ]
+    set pcolor red - 3.5 ;; once the tree is burned, darken its color
   ]
   tick ;; advance the clock by one “tick”
 end
 
 to run-density-analysis
-  ;; for density again. two many variables to consider, i kept density.
+  ;; for all possible densities
   foreach n-values 100 [ i -> i + 1 ] [ density-value ->
 
     set density density-value
 
+    ;; setup
     setup
 
+    ;; run until fires dies
     while [any? patches with [pcolor = red]] [
       go
     ]
 
+    ;; calculate the burnt trees
     let burnt-trees count patches with [pcolor != green and pcolor != black]
 
+    ;; percentage
     let burnt-percentage burnt-trees / initial-trees * 100
 
+    ;; print
     print (word "Density: " density-value " Burnt percentage: " burnt-percentage)
   ]
 end
+
 
 ; Copyright 2006 Uri Wilensky.
 ; See Info tab for full copyright and license.
 @#$#@#$#@
 GRAPHICS-WINDOW
-200
-10
-710
-521
+247
+11
+757
+522
 -1
 -1
 2.0
@@ -217,71 +150,11 @@ NIL
 NIL
 1
 
-SLIDER
-13
-192
-185
-225
-wind-up
-wind-up
--50
-50
-28.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-15
-235
-187
-268
-wind-right
-wind-right
--50
-50
-12.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-17
-279
-189
-312
-probability-of-spread
-probability-of-spread
-0
-100
-39.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-18
-324
-190
-357
-type-two-trees
-type-two-trees
-0
-100
-38.0
-1
-1
-%
-HORIZONTAL
-
 BUTTON
-27
-382
-170
-415
+30
+194
+173
+227
 run-density-analysis
 run-density-analysis
 NIL
