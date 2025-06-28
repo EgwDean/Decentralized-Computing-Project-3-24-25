@@ -1,73 +1,71 @@
 globals [starting-value color-limit remaining]
 
-patches-own [ patch-value ]
+patches-own [ patch-value ] ;; how much humidity a patch has
 
 to setup
   clear-all
   reset-ticks
   ask patches [
     set pcolor white
-    set starting-value 5
-    set remaining 10
-    set color-limit 100
+    set starting-value 5 ;; starting value for humidity. mostly for visual purposes.
+    set remaining 10 ;; how much humidity is left behind when a drop falls
+    set color-limit 100 ;; after a certain value the patches become too dark. visually unpleasant.
 
-    set patch-value starting-value
-    set pcolor scale-color blue starting-value color-limit 0
+    set patch-value starting-value ;; patch value = starting value
+    set pcolor scale-color blue starting-value color-limit 0 ;; get shade of blue according to your humidity. starting with a small amount
     ;;set plabel patch-value
   ]
 end
 
-to go1
-  ;; 1ο βήμα: αύξηση λόγω υγρασίας
+to go
+  ;; increase humidity
   ask patches [
-    if random-float 100 < (humidity-rate / 10) [
-      set patch-value patch-value + 0.5
+    if random-float 100 < (humidity-rate / 10) [ ;; i found that this function works best.
+      set patch-value patch-value + 0.5 ;; increase by 0.5. also after much expererimintation i found this works best
     ]
   ]
 
   let transfers []
 
   ask patches [
-    if patch-value > (100 - gravity) + starting-value [
-      let extra patch-value - remaining
-      let below patch-at 0 -1
-      let below-left patch-at -1 -1
-      let below-right patch-at 1 -1
+    if patch-value > (100 - gravity) + starting-value [ ;; if you overcome the gravity threshold, start going downwards
+      let extra patch-value - remaining ;; the excess humidity that will start going downwards. some will remain.
+      let below patch-at 0 -1 ;; bottom patch
+      let below-left patch-at -1 -1 ;; bottom left
+      let below-right patch-at 1 -1 ;; bottom right
 
-      let options patch-set filter [p -> p != nobody] (list below below-left below-right)
+      let options patch-set filter [p -> p != nobody] (list below below-left below-right) ;; list the three patches. also reminder if you are on the side there are not three bottom patches.
 
       if any? options [
-        let target max-one-of options [patch-value]
+        let target max-one-of options [patch-value] ;; if there are valid patches, get the one with the max value. water follows biggest water
 
-        ;; Έλεγχος πιθανότητας με friction
+        ;; friction comes into play. for a lot of friction, the water does not go downawards.
         if random-float 100 > friction  [
-          ;; Μεταφέρουμε το extra στο target patch
-          set transfers lput (list target extra) transfers
-          set patch-value remaining
+          ;; move excess to bottom patch
+          set transfers lput (list target extra) transfers ;; put the transfer of the extra in the tranfer list
+          set patch-value remaining ;; something remains
         ]
       ]
     ]
   ]
 
-  foreach transfers [ t ->
+  foreach transfers [ t -> ;; execute the transfers.
     ask item 0 t [
-      set patch-value patch-value + item 1 t
+      set patch-value patch-value + item 1 t ;; add the extra
     ]
   ]
 
-  ask patches [
-    ifelse patch-value > 60 [
+  ask patches [ ;;update the color patches. they all get a shade of blue according to the value of humidity.
+    ifelse patch-value > 60 [ ;; dont get too dark. it doesnt look good. but your value increased. just not the color.
       set pcolor scale-color blue 60 color-limit 0
     ]  [
-    set pcolor scale-color blue patch-value color-limit 0
+    set pcolor scale-color blue patch-value color-limit 0 ;; not too dark. you are fine.
     ]
-    ;;set plabel patch-value
+    ;;set plabel patch-value for debugging. still useful.
   ]
 
   tick
 end
-
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -123,7 +121,7 @@ humidity-rate
 humidity-rate
 0
 100
-52.0
+71.0
 1
 1
 NIL
@@ -134,8 +132,8 @@ BUTTON
 44
 186
 77
-go1
-go1
+go
+go
 NIL
 1
 T
@@ -155,7 +153,7 @@ gravity
 gravity
 0
 100
-100.0
+55.0
 1
 1
 NIL
@@ -166,8 +164,8 @@ BUTTON
 45
 262
 78
-go1
-go1
+go
+go
 T
 1
 T
