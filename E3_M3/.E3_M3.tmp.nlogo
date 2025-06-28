@@ -428,8 +428,8 @@ SLIDER
 machine-radius
 machine-radius
 1
-30
-30.0
+50
+25.0
 1
 1
 NIL
